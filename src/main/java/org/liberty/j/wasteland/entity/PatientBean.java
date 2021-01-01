@@ -4,6 +4,7 @@ public class PatientBean {
     private String pID;
     private String pName;
     private char pGender;
+    private Integer pAge;
     private String pNationality;
     private String pPhoneNumber;
     private Boolean pIsMarried;
@@ -11,10 +12,11 @@ public class PatientBean {
     public PatientBean() {
     }
 
-    public PatientBean(String pID, String pName, char pGender, String pNationality, String pPhoneNumber, Boolean pIsMarried) {
+    public PatientBean(String pID, String pName, char pGender, Integer pAge, String pNationality, String pPhoneNumber, Boolean pIsMarried) {
         this.pID = pID;
         this.pName = pName;
         this.pGender = pGender;
+        this.pAge = pAge;
         this.pNationality = pNationality;
         this.pPhoneNumber = pPhoneNumber;
         this.pIsMarried = pIsMarried;

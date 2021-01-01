@@ -1,103 +1,100 @@
 package org.liberty.j.wasteland.entity;
 
 public class ArrangementBean {
-    private String eID;
-    private String eName;
-    private String eDept;
-    private String eDesc;
-    private Double eFee;
-    private String ePosition;
-    private String eStartTime;
-    private String eEndTime;
-    private String eCurrState;
+    private String sID;
+    private String sName;
+    private String sDept;
+    private String sDesc;
+    private Double sFee;
+    private String sPosition;
+    private String docStartTime;
+    private String docEndTime;
+    private String docCurrState;
+
+    public ArrangementBean(String sID, String sName, String sDept, String sDesc, Double sFee, String sPosition, String docStartTime, String docEndTime, String docCurrState) {
+        this.sID = sID;
+        this.sName = sName;
+        this.sDept = sDept;
+        this.sDesc = sDesc;
+        this.sFee = sFee;
+        this.sPosition = sPosition;
+        this.docStartTime = docStartTime;
+        this.docEndTime = docEndTime;
+        this.docCurrState = docCurrState;
+    }
 
     public ArrangementBean() {
     }
 
-    public ArrangementBean(String eID, String eName, String eDept, String eDesc, Double eFee, String ePosition,
-            String eStartTime, String eEndTime, String eCurrState) {
-        this.eID = eID;
-        this.eName = eName;
-        this.eDept = eDept;
-        this.eDesc = eDesc;
-        this.eFee = eFee;
-        this.ePosition = ePosition;
-        this.eStartTime = eStartTime;
-        this.eEndTime = eEndTime;
-        this.eCurrState = eCurrState;
+    public String getsID() {
+        return sID;
     }
 
-    public String geteID() {
-        return eID;
+    public void setsID(String sID) {
+        this.sID = sID;
     }
 
-    public void seteID(String eID) {
-        this.eID = eID;
+    public String getsName() {
+        return sName;
     }
 
-    public String geteName() {
-        return eName;
+    public void setsName(String sName) {
+        this.sName = sName;
     }
 
-    public void seteName(String eName) {
-        this.eName = eName;
+    public String getsDept() {
+        return sDept;
     }
 
-    public String geteDept() {
-        return eDept;
+    public void setsDept(String sDept) {
+        this.sDept = sDept;
     }
 
-    public void seteDept(String eDept) {
-        this.eDept = eDept;
+    public String getsDesc() {
+        return sDesc;
     }
 
-    public String geteDesc() {
-        return eDesc;
+    public void setsDesc(String sDesc) {
+        this.sDesc = sDesc;
     }
 
-    public void seteDesc(String eDesc) {
-        this.eDesc = eDesc;
+    public Double getsFee() {
+        return sFee;
     }
 
-    public Double geteFee() {
-        return eFee;
+    public void setsFee(Double sFee) {
+        this.sFee = sFee;
     }
 
-    public void seteFee(Double eFee) {
-        this.eFee = eFee;
+    public String getsPosition() {
+        return sPosition;
     }
 
-    public String getePosition() {
-        return ePosition;
+    public void setsPosition(String sPosition) {
+        this.sPosition = sPosition;
     }
 
-    public void setePosition(String ePosition) {
-        this.ePosition = ePosition;
+    public String getDocStartTime() {
+        return docStartTime;
     }
 
-    public String geteStartTime() {
-        return eStartTime;
+    public void setDocStartTime(String docStartTime) {
+        this.docStartTime = docStartTime;
     }
 
-    public void seteStartTime(String eStartTime) {
-        this.eStartTime = eStartTime;
+    public String getDocEndTime() {
+        return docEndTime;
     }
 
-    public String geteEndTime() {
-        return eEndTime;
+    public void setDocEndTime(String docEndTime) {
+        this.docEndTime = docEndTime;
     }
 
-    public void seteEndTime(String eEndTime) {
-        this.eEndTime = eEndTime;
+    public String getDocCurrState() {
+        return docCurrState;
     }
 
-    public String geteCurrState() {
-        return eCurrState;
+    public void setDocCurrState(String docCurrState) {
+        this.docCurrState = docCurrState;
     }
-
-    public void seteCurrState(String eCurrState) {
-        this.eCurrState = eCurrState;
-    }
-
-
 }
