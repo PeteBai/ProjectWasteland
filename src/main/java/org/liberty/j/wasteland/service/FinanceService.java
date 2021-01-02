@@ -1,5 +1,6 @@
 package org.liberty.j.wasteland.service;
 
+import org.liberty.j.wasteland.entity.ArrangementBean;
 import org.liberty.j.wasteland.entity.ReservationBean;
 import org.liberty.j.wasteland.mapper.FinanceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,11 @@ public class FinanceService {
     public ReservationBean getReservationDetails(String resvid, String pnid)
     {
         return fm.getReservationRec(resvid, pnid).get(0);
+    }
+
+    public ArrangementBean queryDocSpecificArrangement(String sid, String startTime, Integer wkDay)
+    {
+        return fm.getSpecificArrangement(sid, startTime, wkDay).get(0);
     }
 
 }
