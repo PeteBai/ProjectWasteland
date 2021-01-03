@@ -20,6 +20,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
+@ApiOperation(value = "财务系统的API")
 @RequestMapping(value = "/finance")
 public class FinanceController
 {

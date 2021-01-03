@@ -18,7 +18,7 @@ public class RegisterController {
     @Autowired
     private RegisterService rs;
     @ApiOperation(value = "查询前面排队人数", notes = "由手机端发起请求,因此仅限预约用户")
-    
+
     @RequestMapping(value = "/queryQueueLength", method = RequestMethod.GET)
     public Result queryQLength(@RequestParam(value = "sid") String sid, @RequestParam("cid") String cid)
     {
