@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.liberty.j.wasteland.entity.AnalysisBean;
+import org.liberty.j.wasteland.entity.HistoryBean;
 import org.liberty.j.wasteland.entity.MedicineBean;
 
 import java.util.List;
@@ -41,4 +42,10 @@ public interface TreatmentMapper {
 
     @Insert("insert into test_item_table value(#{sid}, #{ttid}, #{tiid})")
     int insertOneAnaItem(@Param("sid") String sid, @Param("ttid") String ttid, @Param("tiid") String tiid);
+
+    @Select("select * from patient_history where pID=#{pnid}")
+    List<HistoryBean> getPatientHistory(@Param("pnid") String pnid);
+
+    @Insert("insert into patient_history value(#{hb.pID}, #{hb.sID}, #{hb.hID}, #{hb.hDate}, #{hb.hComment})")
+    int insertPatientHistory(@Param("hb") HistoryBean hb);
 }

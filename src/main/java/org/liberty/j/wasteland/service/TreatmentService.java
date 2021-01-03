@@ -2,6 +2,7 @@ package org.liberty.j.wasteland.service;
 
 import org.apache.ibatis.annotations.Param;
 import org.liberty.j.wasteland.entity.AnalysisBean;
+import org.liberty.j.wasteland.entity.HistoryBean;
 import org.liberty.j.wasteland.entity.MedicineBean;
 import org.liberty.j.wasteland.mapper.TreatmentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +82,17 @@ public class TreatmentService {
                 return false;
         }
         return true;
+    }
+
+    public List<HistoryBean> getPatientHistory(String pnid)
+    {
+        return tm.getPatientHistory(pnid);
+    }
+
+    public boolean submitPatientHistory(HistoryBean hb)
+    {
+        int res = tm.insertPatientHistory(hb);
+        return (res==0)?false:true;
     }
 
 }

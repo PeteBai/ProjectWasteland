@@ -3,6 +3,7 @@ package org.liberty.j.wasteland.controller;
 import io.swagger.annotations.ApiOperation;
 import org.liberty.j.wasteland.Exception.Result;
 import org.liberty.j.wasteland.entity.AnalysisBean;
+import org.liberty.j.wasteland.entity.HistoryBean;
 import org.liberty.j.wasteland.entity.MedicineBean;
 import org.liberty.j.wasteland.service.TreatmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,31 @@ public class TreatmentController {
         if(!succ)
             return new Result(false, 200, "出现问题,请联系工作人员");
         return new Result(true, 200, "", _anaID);
+    }
+
+    @ApiOperation(value = "获取用户历史病历")
+    @RequestMapping(value = "/getPatientHistory", method = RequestMethod.GET)
+    public Result getPatientHistory(@RequestParam(value = "pnid") String pnid)
+    {
+        return new Result(true, 200, "", ts.getPatientHistory(pnid));
+    }
+
+    @ApiOperation(value = "添加用户病历",notes = "请确保要添加的用户和医生存在")
+    @RequestMapping(value = "/submitPatientHistory", method = RequestMethod.POST)
+    public Result submitPatientHistory(@RequestParam(value = "pnid") String pnid, @RequestParam(value = "sid") String sid,
+                                       @RequestParam(value = "comment") String comment)
+    {
+        //获取当前时间
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String _now = sdf.format(now);
+        //生成病历ID
+        String _hisID = UUID.randomUUID().toString();
+        HistoryBean hb = new HistoryBean(pnid, sid, _hisID, _now, comment);
+        boolean res = ts.submitPatientHistory(hb);
+        if(!res)
+            return new Result(false, 200, "出现问题,请联系工作人员");
+        return new Result(true, 200, "", _hisID);
     }
 
 }

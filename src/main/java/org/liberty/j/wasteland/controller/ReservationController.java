@@ -29,7 +29,7 @@ import com.alibaba.fastjson.JSONObject;
 @RestController
 @CrossOrigin
 @ApiOperation(value = "预约过程的API")
-public class ReservationController extends NumberGenerater
+public class ReservationController
 {
     public static String readJsonFile(String fileName) {
         String jsonStr = "";
