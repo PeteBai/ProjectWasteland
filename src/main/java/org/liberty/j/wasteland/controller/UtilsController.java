@@ -26,7 +26,7 @@ public class UtilsController {
         if(db == null)
             return new Result(false, 200, "用户不存在!");
         if(pw.compareTo(db.getsPassword()) != 0) {
-            System.out.println(pw.compareTo(db.getsPassword()));
+//            System.out.println(pw.compareTo(db.getsPassword()));
             return new Result(false, 200, "用户密码错误!");
         }
         return new Result(true, 200, "登录成功!", db);

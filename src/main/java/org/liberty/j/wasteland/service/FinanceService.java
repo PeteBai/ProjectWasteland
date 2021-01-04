@@ -69,7 +69,6 @@ public class FinanceService {
     public boolean updateMedTableState(String taid, String newState)
     {
         int res = fm.updateMedTableStat(newState, taid);
-        System.out.println(taid);
         return (res==0)?false:true;
     }
 
