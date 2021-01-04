@@ -3,7 +3,10 @@ package org.liberty.j.wasteland.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
 import org.liberty.j.wasteland.Exception.Result;
+import org.liberty.j.wasteland.assistant.PaymenCheck;
 import org.liberty.j.wasteland.assistant.QueueProcesser;
+import org.liberty.j.wasteland.entity.AnaTableBean;
+import org.liberty.j.wasteland.entity.MedicineTableBean;
 import org.liberty.j.wasteland.entity.ReservationBean;
 import org.liberty.j.wasteland.service.FinanceService;
 import org.liberty.j.wasteland.service.RegisterService;
@@ -13,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -153,4 +153,83 @@ public class FinanceController
             return new Result(true, 200, "挂科室号成功", cid);
         }
     }
+
+    @ApiOperation(value = "查询所有待付款项目", notes = "包括本次就诊所有未付款的检验单和领药单")
+    @RequestMapping(value = "/getAllUnpaidItems", method = RequestMethod.GET)
+    public Result getAllUnpaidItems(@RequestParam("cid") String cid)
+    {
+        HashMap<String, Object[]> ret = fs.getUnpaidItems(cid);
+        return new Result(true, 200, "", ret);
+    }
+
+    @ApiOperation(value = "获取待付款项目链接", notes = "选择要付款的单据,系统返回付款链接")
+    @RequestMapping(value = "/getItemsPayLink", method = RequestMethod.POST)
+    public Result getItemsPayLink(@RequestParam("cid") String cid,
+                                  @RequestBody Map<String, String[]> payList)
+    {
+        double sum = 0;
+        // 分配付款任务ID
+        String psu = UUID.randomUUID().toString();
+        //按照数组内容查询是否存在单子
+        if(payList.containsKey("领药单"))
+        {
+            if(payList.get("领药单").length != 0)
+            {
+                for(String item:payList.get("领药单"))
+                {
+                    MedicineTableBean mtb = fs.getSpecificMedTable(item);
+                    if(mtb == null)
+                        return new Result(false, 200, "领药单不存在!");
+                    sum += mtb.getMtFee();
+                }
+                if(!PaymenCheck.addPayIDToMed(psu, payList.get("领药单")))
+                    return new Result(false, 200, "您还存在未付款的链接,无法生成新付款链接!");
+            }
+        }
+        //按照单子内容计算总价
+        if(payList.containsKey("检验单"))
+        {
+            if(payList.get("检验单").length != 0)
+            {
+                for(String s:payList.get("检验单"))
+                {
+                    AnaTableBean atb = fs.getSpecificAnaTable(s);
+                    if(atb == null)
+                        return new Result(false, 200, "检验单不存在!");
+                    sum += atb.gettFee();
+                }
+                if(!PaymenCheck.addPayIDToAna(psu, payList.get("检验单")))
+                    return new Result(false, 200, "您还存在未付款的链接,无法生成新付款链接!");
+            }
+        }
+        //生成付款链接
+        String ret = "localhost:8080/finance/onClickBait2?payID=" + psu;
+        return new Result(true, 200, "", ret);
+    }
+
+    @ApiOperation(value = "分项付款链接", notes = "由程序生成,由用户点击")
+    @RequestMapping(value = "/onClickBait2", method = RequestMethod.GET)
+    public Result confirmPayment2(@RequestParam("payID") String payID)
+    {
+        String[] medList = PaymenCheck.rmPayIDInMed(payID);
+        if(medList != null)
+        {
+            for (String s : medList)
+            {
+                if (!fs.updateMedTableState(s, "已缴费 未领药"))
+                    return new Result(false, 200, "m请联系工作人员寻求帮助");
+            }
+        }
+        String[] anaList = PaymenCheck.rmPayIDInAna(payID);
+        if(anaList != null)
+        {
+            for(String s : anaList)
+            {
+                if(!fs.updateAnaTableState(s, "已缴费 未检查"))
+                    return new Result(false, 200, "a请联系工作人员寻求帮助");
+            }
+        }
+        return new Result(true, 200, "付款成功");
+    }
+
 }
