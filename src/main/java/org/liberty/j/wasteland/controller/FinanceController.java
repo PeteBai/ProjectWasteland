@@ -6,9 +6,11 @@ import org.liberty.j.wasteland.Exception.Result;
 import org.liberty.j.wasteland.assistant.PaymenCheck;
 import org.liberty.j.wasteland.assistant.QueueProcesser;
 import org.liberty.j.wasteland.entity.AnaTableBean;
+import org.liberty.j.wasteland.entity.MedRetBean;
 import org.liberty.j.wasteland.entity.MedicineTableBean;
 import org.liberty.j.wasteland.entity.ReservationBean;
 import org.liberty.j.wasteland.service.FinanceService;
+import org.liberty.j.wasteland.service.MedicineService;
 import org.liberty.j.wasteland.service.RegisterService;
 import org.liberty.j.wasteland.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +32,12 @@ public class FinanceController
     private ReservationService rs;
     @Autowired
     private RegisterService regs;
+    @Autowired
+    private MedicineService ms;
 
     private HashMap<String, Integer> getDayInt = new HashMap<String, Integer>();
 
-    @ApiOperation(value = "获取付款链接", notes = "用户的各种信息会附加在获取的链接上")
+    @ApiOperation(value = "获取挂号付款链接", notes = "用户的各种信息会附加在获取的链接上")
     @RequestMapping(value = "/getPaymentLink", method = RequestMethod.POST)
     public Result getPaymentLink(HttpServletResponse response,
                                  @RequestParam(value = "pid", required = true) String pnid,
@@ -154,7 +158,7 @@ public class FinanceController
         }
     }
 
-    @ApiOperation(value = "查询所有待付款项目", notes = "包括本次就诊所有未付款的检验单和领药单")
+    @ApiOperation(value = "就诊后查询所有待付款项目", notes = "包括本次就诊所有未付款的检验单和领药单")
     @RequestMapping(value = "/getAllUnpaidItems", method = RequestMethod.GET)
     public Result getAllUnpaidItems(@RequestParam("cid") String cid)
     {
@@ -162,7 +166,7 @@ public class FinanceController
         return new Result(true, 200, "", ret);
     }
 
-    @ApiOperation(value = "获取待付款项目链接", notes = "选择要付款的单据,系统返回付款链接")
+    @ApiOperation(value = "就诊后获取待付款项目链接", notes = "选择要付款的单据,系统返回付款链接")
     @RequestMapping(value = "/getItemsPayLink", method = RequestMethod.POST)
     public Result getItemsPayLink(@RequestParam("cid") String cid,
                                   @RequestBody Map<String, String[]> payList)
@@ -207,7 +211,7 @@ public class FinanceController
         return new Result(true, 200, "", ret);
     }
 
-    @ApiOperation(value = "分项付款链接", notes = "由程序生成,由用户点击")
+    @ApiOperation(value = "就诊后分项付款链接", notes = "由程序生成,由用户点击")
     @RequestMapping(value = "/onClickBait2", method = RequestMethod.GET)
     public Result confirmPayment2(@RequestParam("payID") String payID)
     {
@@ -230,6 +234,98 @@ public class FinanceController
             }
         }
         return new Result(true, 200, "付款成功");
+    }
+
+    @ApiOperation(value = "退药费", notes = "需要一个界面")
+    @RequestMapping(value = "/medicineRefund", method = RequestMethod.POST)
+    public Result medicineRefund(@RequestParam("pid") String pnid, @RequestParam("mrid") String mrid)
+    {
+        //获取退药单信息
+        MedRetBean mrb = ms.querySpecificMedRetTable(mrid);
+        if(mrb == null)
+            return new Result(false, 200, "请检查退药单是否存在!");
+        //比对用户信息
+        if(pnid.compareTo(mrb.getpID()) != 0)
+            return new Result(false, 200, "退药单用户信息不匹配!");
+        //检查退药单状态
+        if("未退费".compareTo(mrb.getMrStatus()) != 0)
+            return new Result(false, 200, "退药单已经完成!");
+        //更新退药单状态
+        if(!ms.finishMedRet(mrid))
+            return new Result(false, 200, "退药失败, 请联系工作人员寻求帮助");
+        //财务系统退费
+        return new Result(true, 200, "退费"+((Double) mrb.getMrFee()).toString()+"元成功!", mrb.getMrFee());
+    }
+
+    @ApiOperation(value = "退费", notes = "退未检验/未领药的费用,已经领药的去退药费那里,目前设计的是只能退本次治疗的东西")
+    @RequestMapping(value = "/refund", method = RequestMethod.POST)
+    public Result refund(@RequestParam("cid") String cid, @RequestBody Map<String, String[]> retBody)
+    {
+        double retAmount = 0;
+        String ret = "";
+        boolean res = true;
+        //查询领药单
+        if(retBody.containsKey("领药单"))
+        {
+            ret += "领药单退费情况: ";
+            for(String s:retBody.get("领药单"))
+            {
+                MedicineTableBean mtb = fs.getSpecificMedTable(s);
+                if(mtb == null) {
+//                    return new Result(false, 200, "该领药单不存在!");
+                    ret += "该领药单不存在!";
+                    res = false;
+                }
+                if(mtb.getMtStatus().compareTo("已缴费 未领药") == 0)
+                {
+                    retAmount += mtb.getMtFee();
+                    if(!fs.updateMedTableState(s, "已退费")){
+//                        return new Result(false, 200, "退药费失败, 请联系工作人员寻求帮助");
+                        ret +="退药费失败, 请联系工作人员寻求帮助";
+                        res = false;
+                    }
+                }
+                else
+                {
+//                    return new Result(false, 200, "该领药单已经被使用过,无法退费!");
+                    ret += "该领药单已经被使用过,无法退费!";
+                    res = false;
+                }
+            }
+            ret += "领药单退费"+retAmount+"元.";
+        }
+        //查询检验单
+        if(retBody.containsKey("检验单"))
+        {
+            ret += "检验单退费情况: ";
+            for(String s:retBody.get("检验单"))
+            {
+                AnaTableBean atb = fs.getSpecificAnaTable(s);
+                if(atb == null){
+//                    return new Result(false, 200, "该检验单不存在!");
+                    ret += "该检验单不存在!";
+                    res = false;
+                }
+                if(atb.gettStatus().compareTo("已缴费 未检查") == 0)
+                {
+                    retAmount += atb.gettFee();
+                    if(!fs.updateAnaTableState(s, "已退费")) {
+//                        return new Result(false, 200, "退检查费失败, 请联系工作人员寻求帮助");
+                        ret += "退检查费失败, 请联系工作人员寻求帮助";
+                        res = false;
+                    }
+                }
+                else
+                {
+//                    return new Result(false, 200, "该检验单已经被使用过,无法退费!");
+                    ret += "该检验单已经被使用过,无法退费!";
+                    res = false;
+                }
+            }
+            ret += "检验单退费"+retAmount+"元.";
+        }
+        //计算费用完成退费
+        return new Result(res, 200, ret, retAmount);
     }
 
 }

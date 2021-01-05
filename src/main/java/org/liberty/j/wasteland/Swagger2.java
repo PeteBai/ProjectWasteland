@@ -26,10 +26,10 @@ public class Swagger2 {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("APIs")
-                .description("医疗管理系统API实例")
+                .title("Wasteland APIs")
+                .description("医疗管理系统API")
                 .contact("xiangyubai@outlook.com")
-                .version("1.0")
+                .version("2.0")
                 .build();
     }
 

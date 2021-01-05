@@ -1,9 +1,6 @@
 package org.liberty.j.wasteland.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.liberty.j.wasteland.entity.AnalysisBean;
 import org.liberty.j.wasteland.entity.HistoryBean;
 import org.liberty.j.wasteland.entity.MedicineBean;
@@ -48,4 +45,7 @@ public interface TreatmentMapper {
 
     @Insert("insert into patient_history value(#{hb.pID}, #{hb.sID}, #{hb.hID}, #{hb.hDate}, #{hb.hComment})")
     int insertPatientHistory(@Param("hb") HistoryBean hb);
+
+    @Update("update clinic_record set Curr_State=\"COMPLETE\" where CID=#{cid}")
+    boolean finishClinicRecord(@Param("cid") String cid);
 }

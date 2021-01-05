@@ -2,14 +2,17 @@ package org.liberty.j.wasteland.controller;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.liberty.j.wasteland.Exception.Result;
 import org.liberty.j.wasteland.assistant.NumberGenerater;
+import org.liberty.j.wasteland.entity.*;
 import org.liberty.j.wasteland.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.liberty.j.wasteland.entity.ArrangementBean;
-import org.liberty.j.wasteland.entity.DoctorBean;
-import org.liberty.j.wasteland.entity.PatientBean;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -100,7 +100,7 @@ public class ReservationController
         }
         else
         {
-            return new Result<>(true, 200, "no existing user");
+            return new Result<>(false, 200, "no existing user");
         }
     }
 
@@ -128,8 +128,107 @@ public class ReservationController
                                     @RequestParam(value = "weekday") Integer weekday,
                                     @RequestParam(value = "startTime") String stime) throws Exception
     {
+        // 要先查询该时间段是否已经被预约
+        if(rs.queryIsReserved(sid, stime, weekday))
+            return new Result(false, 200, "该时间段已被预约!");
         Map<Boolean, String> res = rs.sumbitReservation(pnid, sid, weekday, stime);
         return new Result<>(true, 200, "", res);
     }
 
+    @ApiOperation(value = "查询领药单状态", notes = "仅用于手机端,显示所有就诊产生的记录")
+    @RequestMapping(value = "/reservation/queryMedTable", method = RequestMethod.POST)
+    public Result queryMedTable(@RequestParam("pid") String pnid) throws Exception
+    {
+        //检查用户是否存在
+        List<PatientBean> lpb = rs.querySpecificPatient(pnid);
+        if(lpb.size() > 0)
+        {
+            PatientBean pb = lpb.get(0);
+            HashMap<String, List<MedicineTableBean>> allTable = rs.queryAllMedTableByUser(pb.getpID());
+            if(allTable == null)
+                return new Result<>(false, 200, "用户很健康,未曾就诊!");
+            return new Result<>(true, 200, "", allTable);
+        }
+        else
+        {
+            return new Result<>(false, 200, "用户不存在!");
+        }
+    }
+
+    @ApiOperation(value = "查询检验单状态", notes = "仅用于手机端,显示所有就诊产生的记录")
+    @RequestMapping(value = "/reservation/queryAnaTable", method = RequestMethod.POST)
+    public Result queryAnaTable(@RequestParam("pid") String pnid) throws Exception
+    {
+        //检查用户是否存在
+        List<PatientBean> lpb = rs.querySpecificPatient(pnid);
+        if(lpb.size() > 0)
+        {
+            PatientBean pb = lpb.get(0);
+            HashMap<String, List<AnaTableBean>> allTable = rs.queryAllAnaTableByUser(pb.getpID());
+            if(allTable == null)
+                return new Result<>(false, 200, "用户很健康,未曾就诊!");
+            return new Result<>(true, 200, "", allTable);
+        }
+        else
+        {
+            return new Result<>(false, 200, "用户不存在!");
+        }
+    }
+
+    @ApiOperation(value = "查询退药单状态", notes = "仅用于手机端,显示用户的记录")
+    @RequestMapping(value = "/reservation/queryMedRetTable", method = RequestMethod.POST)
+    public Result queryMedRetTable(@RequestParam("pid") String pnid) throws Exception
+    {
+        List<PatientBean> lpb = rs.querySpecificPatient(pnid);
+        if(lpb.size() > 0)
+        {
+            PatientBean pb = lpb.get(0);
+            List<MedRetBean> allTable = rs.queryAllMedRetByUser(pb.getpID());
+            if(allTable.size() == 0)
+                return new Result<>(false, 200, "该用户未进行过退药.");
+            return new Result<>(true, 200, "", allTable);
+        }
+        else
+        {
+            return new Result<>(false, 200, "用户不存在!");
+        }
+    }
+
+    @ApiOperation(value = "查询就诊记录", notes = "仅用于手机端,显示用户的记录")
+    @RequestMapping(value = "/reservation/queryClinicHistory", method = RequestMethod.POST)
+    public Result queryClinicHistory(@RequestParam("pid") String pnid) throws Exception
+    {
+        List<PatientBean> lpb = rs.querySpecificPatient(pnid);
+        if(lpb.size() > 0)
+        {
+            PatientBean pb = lpb.get(0);
+            List<ClinicRecordBean> lcrb = rs.queryClinicRec(pb.getpID());
+            if(lcrb.size() == 0)
+                return new Result<>(false, 200, "用户很健康,未曾就诊!");
+            return new Result<>(true, 200, "", lcrb);
+        }
+        else
+        {
+            return new Result<>(false, 200, "用户不存在!");
+        }
+    }
+
+    @ApiOperation(value = "查询预约记录", notes = "仅用于手机端")
+    @RequestMapping(value = "/reservation/queryReservationHistory", method = RequestMethod.POST)
+    public Result queryReservationHistory(@RequestParam("pid") String pnid) throws Exception
+    {
+        List<PatientBean> lpb = rs.querySpecificPatient(pnid);
+        if(lpb.size() > 0)
+        {
+            PatientBean pb = lpb.get(0);
+            List<ReservationBean> lrb = rs.queryReservationsByUser(pnid);
+            if(lrb.size() == 0)
+                return new Result<>(false, 200, "用户未曾进行预约!");
+            return new Result<>(true, 200, "", lrb);
+        }
+        else
+        {
+            return new Result<>(false, 200, "用户不存在!");
+        }
+    }
 }

@@ -9,9 +9,10 @@ public class ArrangementBean {
     private String sPosition;
     private String docStartTime;
     private String docEndTime;
+    private Integer WeekDay;
     private String docCurrState;
 
-    public ArrangementBean(String sID, String sName, String sDept, String sDesc, Double sFee, String sPosition, String docStartTime, String docEndTime, String docCurrState) {
+    public ArrangementBean(String sID, String sName, String sDept, String sDesc, Double sFee, String sPosition, String docStartTime, String docEndTime, Integer WeekDay, String docCurrState) {
         this.sID = sID;
         this.sName = sName;
         this.sDept = sDept;
@@ -20,6 +21,7 @@ public class ArrangementBean {
         this.sPosition = sPosition;
         this.docStartTime = docStartTime;
         this.docEndTime = docEndTime;
+        this.WeekDay = WeekDay;
         this.docCurrState = docCurrState;
     }
 
@@ -96,5 +98,13 @@ public class ArrangementBean {
 
     public void setDocCurrState(String docCurrState) {
         this.docCurrState = docCurrState;
+    }
+
+    public Integer getWeekDay() {
+        return WeekDay;
+    }
+
+    public void setWeekDay(Integer weekDay) {
+        WeekDay = weekDay;
     }
 }

@@ -89,6 +89,8 @@ public class TreatmentService {
         return tm.getPatientHistory(pnid);
     }
 
+    public boolean finishTreatment(String cid) { return tm.finishClinicRecord(cid); }
+
     public boolean submitPatientHistory(HistoryBean hb)
     {
         int res = tm.insertPatientHistory(hb);

@@ -106,10 +106,10 @@ public class TreatmentController {
         return new Result(true, 200, "", ts.getPatientHistory(pnid));
     }
 
-    @ApiOperation(value = "添加用户病历",notes = "请确保要添加的用户和医生存在")
+    @ApiOperation(value = "提交用户病历",notes = "请确保要添加的用户和医生存在")
     @RequestMapping(value = "/submitPatientHistory", method = RequestMethod.POST)
     public Result submitPatientHistory(@RequestParam(value = "pnid") String pnid, @RequestParam(value = "sid") String sid,
-                                       @RequestParam(value = "comment") String comment)
+                                       @RequestParam(value = "comment") String comment, @RequestParam(value = "cid") String cid)
     {
         //获取当前时间
         Date now = new Date();
@@ -120,6 +120,9 @@ public class TreatmentController {
         HistoryBean hb = new HistoryBean(pnid, sid, _hisID, _now, comment);
         boolean res = ts.submitPatientHistory(hb);
         if(!res)
+            return new Result(false, 200, "出现问题,请联系工作人员");
+        //修改用户状态为就诊完成
+        if(!ts.finishTreatment(cid))
             return new Result(false, 200, "出现问题,请联系工作人员");
         return new Result(true, 200, "", _hisID);
     }

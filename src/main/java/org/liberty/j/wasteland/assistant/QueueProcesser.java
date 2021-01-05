@@ -101,6 +101,18 @@ public class QueueProcesser {
         return theQueue.get(sID).get("PRIO").size();
     }
 
+    public static int getTotalLen(String sID)
+    {
+        if(theQueue.containsKey(sID))
+        {
+            return theQueue.get(sID).get("PRIO").size() + theQueue.get(sID).get("NORM").size();
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
     public static void main(String[] args) {
 //        System.out.println(getLen("D00002", "PRIO"));
     }

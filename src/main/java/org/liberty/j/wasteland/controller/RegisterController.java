@@ -39,6 +39,17 @@ public class RegisterController {
         return new Result(true, 200, "", len);
     }
 
+    @ApiOperation(value = "查询医生队列长度", notes = "返回的是优先和普通队列长度之和")
+    @RequestMapping(value = "/queryDocQLength", method = RequestMethod.GET)
+    public Result queryDocQLength(@RequestParam("sid") String sid)
+    {
+        int totalLen = QueueProcesser.getTotalLen(sid);
+        if(totalLen == -1)
+            return new Result(false, 200, "出现问题,请联系工作人员");
+        else
+            return new Result(true, 200, "", totalLen);
+    }
+
     @ApiOperation(value = "医生叫号", notes = "医生点击下一次时,返回下一个病人的就诊号/身份证号/姓名,但显示的时候不要用就诊号")
     @RequestMapping(value = "/callForNext", method = RequestMethod.GET)
     public Result callForNext(@RequestParam("sid") String sid)

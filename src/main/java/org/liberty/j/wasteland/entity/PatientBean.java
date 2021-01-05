@@ -12,6 +12,14 @@ public class PatientBean {
     public PatientBean() {
     }
 
+    public Integer getpAge() {
+        return pAge;
+    }
+
+    public void setpAge(Integer pAge) {
+        this.pAge = pAge;
+    }
+
     public PatientBean(String pID, String pName, char pGender, Integer pAge, String pNationality, String pPhoneNumber, Boolean pIsMarried) {
         this.pID = pID;
         this.pName = pName;
