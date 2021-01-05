@@ -57,7 +57,7 @@ public class ReservationService {
     {
         List<ArrangementBean> lab = rm.getCertainArrangement(sID, sTime, wkDay);
         if(lab.size() == 0)
-            return false;
+            return true;
         if(lab.get(0).getDocCurrState().compareTo("RESV") == 0)
             return true;
         return false;

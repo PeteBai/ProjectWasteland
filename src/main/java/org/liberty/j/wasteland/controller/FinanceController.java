@@ -46,7 +46,7 @@ public class FinanceController
                                  @RequestParam(value = "resvid", required = false) String resvid) throws Exception
     {
         Double fee = fs.getDocFee(sid);
-        String ret = "localhost:8080/finance/onClickBait1?pid="+pnid+"&sid="+sid+"fee="+fee.toString();
+        String ret = "localhost:8080/finance/onClickBait1?pid="+pnid+"&sid="+sid+"&fee="+fee.toString();
         if(isReserved && resvid != null)
         {
             ret += "&isReserved=true&resvid=";
@@ -87,13 +87,13 @@ public class FinanceController
             // 星期的判断，不在同一天到就不行
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
             String _resvDay = sdf.format(today);
-            getDayInt.put("星期一", 1);
-            getDayInt.put("星期二", 2);
-            getDayInt.put("星期三", 3);
-            getDayInt.put("星期四", 4);
-            getDayInt.put("星期五", 5);
-            getDayInt.put("星期六", 6);
-            getDayInt.put("星期日", 7);
+            getDayInt.put("星期一", 2);
+            getDayInt.put("星期二", 3);
+            getDayInt.put("星期三", 4);
+            getDayInt.put("星期四", 5);
+            getDayInt.put("星期五", 6);
+            getDayInt.put("星期六", 7);
+            getDayInt.put("星期日", 1);
             Integer __resvDay = getDayInt.get(_resvDay);
             if(__resvDay.intValue() != resvDay.intValue())
                 return new Result(false, 200, "付款失败，预约信息不符！", resvDay);
