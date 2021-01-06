@@ -5,24 +5,26 @@ import com.alibaba.fastjson.JSONObject;
 import org.liberty.j.wasteland.entity.DoctorBean;
 import org.liberty.j.wasteland.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.*;
 import java.util.*;
 
 public class QueueProcesser {
     static HashMap<String, HashMap<String, Queue<String>>> theQueue = new HashMap<String, HashMap<String, Queue<String>>>();
-    public static String readJsonFile(String fileName) {
+    public static String readJsonFile(InputStream jsonFileStream)
+    {
         String jsonStr = "";
         try {
-            File jsonFile = new File(fileName);
-            FileReader fileReader = new FileReader(jsonFile);
-            Reader reader = new InputStreamReader(new FileInputStream(jsonFile),"utf-8");
+//            File jsonFile = new File(fileName);
+//            FileReader fileReader = new FileReader(jsonFile);
+            Reader reader = new InputStreamReader(jsonFileStream,"utf-8");
             int ch = 0;
             StringBuffer sb = new StringBuffer();
             while ((ch = reader.read()) != -1) {
                 sb.append((char) ch);
             }
-            fileReader.close();
+//            fileReader.close();
             reader.close();
             jsonStr = sb.toString();
             return jsonStr;
@@ -34,8 +36,14 @@ public class QueueProcesser {
     static
     {
         //初始化,查询出所有医生
-        String docs = "src/main/java/org/liberty/j/wasteland/static/doctors.json";
-        String jsonStr = readJsonFile(docs);
+//        String docs = "src/main/resources/static/doctors.json";
+        ClassPathResource cpr = new ClassPathResource("doctors.json");
+        String jsonStr = null;
+        try {
+            jsonStr = QueueProcesser.readJsonFile(cpr.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         JSONObject jobj = JSON.parseObject(jsonStr);
         List<String> allDocs = (List<String>) jobj.get("doctors");
         for(String s_db : allDocs)

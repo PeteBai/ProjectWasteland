@@ -2,7 +2,9 @@ package org.liberty.j.wasteland.assistant;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.FileInputStream;
 import java.util.*;
 
 public class MedicineCheck {
@@ -10,8 +12,14 @@ public class MedicineCheck {
     static HashMap<String, List<String>> waitingList = new HashMap<String, List<String>>();
     static List<String> allPhar;
     static {
-        String loc = "src/main/java/org/liberty/j/wasteland/static/pharmacists.json";
-        String jsonStr = QueueProcesser.readJsonFile(loc);
+//        String loc = "src/main/resources/static/pharmacists.json";
+        ClassPathResource cpr = new ClassPathResource("pharmacists.json");
+        String jsonStr = null;
+        try {
+            jsonStr = QueueProcesser.readJsonFile(cpr.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         JSONObject jobj = JSON.parseObject(jsonStr);
         List<String> allDocs = (List<String>) jobj.get("pharmacists");
         allPhar = allDocs;

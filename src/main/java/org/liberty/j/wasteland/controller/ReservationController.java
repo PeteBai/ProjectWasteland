@@ -12,9 +12,12 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.liberty.j.wasteland.Exception.Result;
 import org.liberty.j.wasteland.assistant.NumberGenerater;
+import org.liberty.j.wasteland.assistant.QueueProcesser;
 import org.liberty.j.wasteland.entity.*;
 import org.liberty.j.wasteland.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,26 +34,6 @@ import com.alibaba.fastjson.JSONObject;
 @ApiOperation(value = "预约过程的API")
 public class ReservationController
 {
-    public static String readJsonFile(String fileName) {
-        String jsonStr = "";
-        try {
-            File jsonFile = new File(fileName);
-            FileReader fileReader = new FileReader(jsonFile);
-            Reader reader = new InputStreamReader(new FileInputStream(jsonFile),"utf-8");
-            int ch = 0;
-            StringBuffer sb = new StringBuffer();
-            while ((ch = reader.read()) != -1) {
-                sb.append((char) ch);
-            }
-            fileReader.close();
-            reader.close();
-            jsonStr = sb.toString();
-            return jsonStr;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
     @Autowired
     private ReservationService rs;
     @RequestMapping(value = "/reservation/queryAllDocs", method = RequestMethod.GET)
@@ -65,8 +48,9 @@ public class ReservationController
     @RequestMapping(value = "/reservation/getAllDepts", method = RequestMethod.GET)
     public Result getAllDepts() throws Exception
     {
-        String localDepts = "src/main/java/org/liberty/j/wasteland/static/departments.json";
-        String jsonStr = readJsonFile(localDepts);
+//        String localDepts = "departments.json";
+        ClassPathResource cpr = new ClassPathResource("departments.json");
+        String jsonStr = QueueProcesser.readJsonFile(cpr.getInputStream());
         JSONObject jobj = JSON.parseObject(jsonStr);
         Result r = new Result<>(true, 200, "", jobj);
         return r;

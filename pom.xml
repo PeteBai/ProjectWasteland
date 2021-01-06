@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.liberty.j</groupId>
 	<artifactId>wasteland</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>Beta3</version>
 	<packaging>war</packaging>
 	<name>wasteland</name>
 	<description>Demo project for Spring Boot</description>

@@ -46,7 +46,7 @@ public class FinanceController
                                  @RequestParam(value = "resvid", required = false) String resvid) throws Exception
     {
         Double fee = fs.getDocFee(sid);
-        String ret = "localhost:8080/finance/onClickBait1?pid="+pnid+"&sid="+sid+"&fee="+fee.toString();
+        String ret = "39.108.63.4:8080/finance/onClickBait1?pid="+pnid+"&sid="+sid+"&fee="+fee.toString();
         if(isReserved && resvid != null)
         {
             ret += "&isReserved=true&resvid=";
@@ -207,7 +207,7 @@ public class FinanceController
             }
         }
         //生成付款链接
-        String ret = "localhost:8080/finance/onClickBait2?payID=" + psu;
+        String ret = "39.108.63.4:8080/finance/onClickBait2?payID=" + psu;
         return new Result(true, 200, "", ret);
     }
 
